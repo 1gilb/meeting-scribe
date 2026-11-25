@@ -4,7 +4,7 @@ import {
   useRef,
   useState,
 } from "react";
-import { ChevronLeft, Pencil } from "lucide-react";
+import { Check, ChevronLeft, Copy, Pencil } from "lucide-react";
 import { api } from "../api";
 import { summaryClipboardSections } from "../summaryClipboard";
 import { SPEAKER_COLORS } from "../speakerColors";
@@ -159,6 +159,11 @@ export default function MeetingDetailsView({
       setTimeout(() => setCopied((c) => (c === key ? null : c)), 1500);
     });
   };
+  // same format as transcript.md, plus the summary, for pasting into an AI chat
+  const copyTranscript = () =>
+    api
+      .transcriptMarkdown(rec.id)
+      .then((md) => md && copySection("transcript", md));
 
   // One source of truth for copied summary sections. Each section
   // title travels with the text, and Copy all is the same list joined up
@@ -455,6 +460,18 @@ export default function MeetingDetailsView({
                   {linting ? "Polishing…" : `Polish with ${ai.name}`}
                 </button>
               )}
+              <button
+                className="icon"
+                onClick={() => copyTranscript()}
+                title="Copy transcript as Markdown (for pasting into an AI chat)"
+                aria-label="Copy transcript"
+              >
+                {copied === "transcript" ? (
+                  <Check size={15} aria-hidden="true" />
+                ) : (
+                  <Copy size={15} aria-hidden="true" />
+                )}
+              </button>
               {showTx && (
                 <label className="follow-toggle" title="Keep the part being played in view">
                   <input
